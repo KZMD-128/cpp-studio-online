@@ -1,0 +1,23 @@
+services:
+  api:
+    build:
+      context: ./backend/api
+    container_name: cpp-studio-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      PORT: "8080"
+      JOBS_DIR: /jobs
+      JOBS_HOST_DIR: ${JOBS_HOST_DIR:?Set JOBS_HOST_DIR in .env to an absolute host path}
+      CPP_STUDIO_ALLOWED_ORIGINS: ${CPP_STUDIO_ALLOWED_ORIGINS:?Set the exact GitHub Pages origin in .env}
+      RATE_LIMIT_PER_MINUTE: "8"
+      MAX_CONCURRENT_JOBS: "2"
+      TRUST_PROXY: "1"
+      RUNNER_IMAGE: cpp-studio-runner:latest
+      RUNNER_RUNTIME: ${RUNNER_RUNTIME:-}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${JOBS_HOST_DIR}:/jobs
+    security_opt:
+      - no-new-privileges:true
